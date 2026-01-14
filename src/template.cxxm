@@ -1,0 +1,7 @@
+export module Hello;
+
+export namespace mod {
+struct Hello {
+  auto operator()() const -> int;
+};
+} // namespace mod

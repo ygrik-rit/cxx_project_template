@@ -1,0 +1,30 @@
+name: Base build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [fedora-latest, windows-latest, macos-latest]
+        build_type: [RelWithDebInfo, Release, Debug, MinSizeRel]
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run CMake Workflow for ${{ matrix.os }}
+      working-directory: ${{ github.workspace }}
+      run: >
+        cmake --workflow base-${{ matrix.build_type }}
+        
+    - name: Run Android build on ${{ matrix.os }}
+      working-directory: ${{ github.workspace }}/android-project
+      run: >
+        ${{ github.workspace }}/android-project/gradlew assembleTemplate${{ matrix.build_type }}
+        
