@@ -9,8 +9,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
 set(CMAKE_CXX_MODULE_STD 1)
 
-add_compile_options(-std=c++26 -Werror -Wpedantic -Wall)
-add_link_options(--rtlib=compiler-rt)
+# add_link_options(--rtlib=compiler-rt)
+# add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
 
 project(
     template
