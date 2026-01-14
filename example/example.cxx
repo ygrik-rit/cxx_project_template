@@ -1,5 +1,3 @@
-import std;
-
 import Hello;
 
 int main() {

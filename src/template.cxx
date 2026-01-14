@@ -1,6 +1,3 @@
-module;
-#include <iostream>
-
 module Hello;
 
 namespace mod {

@@ -13,7 +13,8 @@ target_include_directories(
         $<INSTALL_INTERFACE:include>
 )
 
-# todo findpackage
+add_library(template::template ALIAS template)
+
 install(
     TARGETS template
     EXPORT templateTargets

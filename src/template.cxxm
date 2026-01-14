@@ -1,5 +1,7 @@
 export module Hello;
 
+export import std;
+
 export namespace mod {
 struct Hello {
   auto operator()() const -> int;

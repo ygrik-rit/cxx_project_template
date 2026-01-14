@@ -5,4 +5,4 @@ else()
 endif()
 
 target_sources(example PRIVATE example.cxx)
-target_link_libraries(example PRIVATE template)
+target_link_libraries(example PRIVATE template::template)
