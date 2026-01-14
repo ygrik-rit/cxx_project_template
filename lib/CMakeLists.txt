@@ -1,0 +1,6 @@
+set(SDL_STATIC ON)
+set(SDL_SHARED OFF)
+set(SDL_TESTS OFF)
+set(SDL_DISABLE_INSTALL ON)
+add_subdirectory(SDL)
+add_subdirectory(Vulkan-Hpp)

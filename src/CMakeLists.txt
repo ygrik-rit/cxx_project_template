@@ -12,13 +12,6 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>
 )
+target_link_libraries(template PRIVATE SDL3::SDL3-static)
 
 add_library(template::template ALIAS template)
-
-install(
-    TARGETS template
-    EXPORT templateTargets
-    FILE_SET HEADERS DESTINATION include/template
-    FILE_SET template_module DESTINATION lib
-)
-install(EXPORT templateTargets NAMESPACE template:: DESTINATION lib/cmake)
