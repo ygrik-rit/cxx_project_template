@@ -22,12 +22,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt update
-        sudo apt install clang libclang-dev libc++-dev libomp-dev llvm-dev libclang-rt-dev wget -y
-        sudo apt remove cmake
-        wget https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-x86_64.sh
-        sudo bash ./cmake-4.2.1-linux-x86_64.sh --prefix=/usr --skip-license --exclude-subdir
-        whereis cmake
-        cmake --version
+        sudo apt install clang libclang-dev libc++-dev libomp-dev llvm-dev libclang-rt-dev wget cmake -y
 
     - name: Run CMake Workflow for ${{ matrix.os }}
       working-directory: ${{ github.workspace }}
