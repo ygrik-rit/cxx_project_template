@@ -42,10 +42,25 @@
     "buildPresets": [
         {
             "name": "base-Debug",
+            "configurePreset": "base",
             "configuration": "Debug"
         }
     ],
     "testPresets": [],
     "packagePresets": [],
-    "workflowPresets": []
+    "workflowPresets": [
+        {
+            "name": "base-Debug",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "base"
+                },
+                {
+                    "type": "build",
+                    "name": "base-Debug"
+                }
+            ]
+        }
+    ]
 }

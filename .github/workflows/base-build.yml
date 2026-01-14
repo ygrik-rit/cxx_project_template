@@ -13,18 +13,27 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [fedora-latest, windows-latest, macos-latest]
-        build_type: [RelWithDebInfo, Release, Debug, MinSizeRel]
+        os: [ubuntu-latest] # windows-latest, macos-latest
+        build_type: [Debug] # RelWithDebInfo, Release, Debug, MinSizeRel 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Install Clang, libc++, compiler-rt, cmake
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt update
+        sudo apt install clang libclang-dev libc++-dev libomp-dev llvm-dev libclang-rt-dev wget -y
+        sudo apt remove cmake
+        wget https://github.com/Kitware/CMake/releases/download/v4.2.1/cmake-4.2.1-linux-x86_64.sh
+        sudo bash ./cmake-4.2.1-linux-x86_64.sh --prefix=/usr --skip-license
 
     - name: Run CMake Workflow for ${{ matrix.os }}
       working-directory: ${{ github.workspace }}
       run: >
-        cmake --workflow base-${{ matrix.build_type }}
+        cmake --workflow --preset=base-${{ matrix.build_type }}
         
-    - name: Run Android build on ${{ matrix.os }}
-      working-directory: ${{ github.workspace }}/android-project
-      run: >
-        ${{ github.workspace }}/android-project/gradlew assembleTemplate${{ matrix.build_type }}
+    # - name: Run Android build on ${{ matrix.os }}
+    #   working-directory: ${{ github.workspace }}/android-project
+    #   run: >
+    #     ${{ github.workspace }}/android-project/gradlew assembleTemplate${{ matrix.build_type }}
         
