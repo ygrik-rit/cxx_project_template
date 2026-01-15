@@ -1,7 +1,6 @@
-import Hello;
+import engine;
 
-int main() {
-  constexpr mod::Hello hello;
-  std::cout << hello();
-  return 0;
+int main()
+{
+    return tlt::run();
 }

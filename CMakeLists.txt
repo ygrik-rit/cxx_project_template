@@ -9,6 +9,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
 set(CMAKE_CXX_MODULE_STD 1)
 
+add_link_options(-fuse-ld=mold)
 # add_link_options(--rtlib=compiler-rt)
 # add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>)
 
@@ -19,6 +20,10 @@ project(
     HOMEPAGE_URL "http://localhost"
     LANGUAGES C CXX
 )
+
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+find_package(options REQUIRED)
 
 add_subdirectory(lib)
 add_subdirectory(src)

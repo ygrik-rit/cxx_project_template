@@ -1,9 +1,68 @@
-export module Hello;
-
+module;
+#include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_video.h>
+#include <cstdlib>
+export module engine;
 export import std;
 
-export namespace mod {
-struct Hello {
-  auto operator()() const -> int;
+namespace tlt::input
+{
+enum class keycode : std::uint32_t
+{
+    escape = SDLK_ESCAPE,
 };
-} // namespace mod
+
+std::string keycode_to_name(keycode value)
+{
+    switch (value)
+    {
+        case keycode::escape:
+            return "Escape";
+    }
+}
+} // namespace tlt::input
+
+namespace tlt::window
+{
+class window_impl
+{
+public:
+    window_impl(std::string title, int width, int height);
+    window_impl(const window_impl&) = delete;
+    ~window_impl() { close(); };
+
+    [[nodiscard]] bool create() noexcept;
+    void               close() noexcept;
+
+    void poll_event() noexcept;
+
+    [[nodiscard]] bool is_running() const noexcept;
+
+private:
+    SDL_Window* window = nullptr;
+    std::string title{};
+    int         width{};
+    int         height{};
+    bool        running{};
+};
+} // namespace tlt::window
+
+export namespace tlt
+{
+int run()
+{
+    tlt::window::window_impl wnd("TemplateApp", 480, 320);
+
+    bool success = wnd.create();
+    if (!success)
+    {
+        return EXIT_FAILURE;
+    }
+
+    while (wnd.is_running())
+    {
+        wnd.poll_event();
+    }
+    return EXIT_SUCCESS;
+}
+} // namespace tlt

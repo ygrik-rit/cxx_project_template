@@ -12,7 +12,7 @@ target_include_directories(
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<INSTALL_INTERFACE:include>
 )
-target_link_libraries(template PRIVATE SDL3::SDL3-static Vulkan::HppModule)
+target_link_libraries(template PRIVATE SDL3::SDL3-shared Vulkan::HppModule)
 target_compile_options(template PRIVATE -Werror -Wpedantic -Wall)
 
 add_library(template::template ALIAS template)
