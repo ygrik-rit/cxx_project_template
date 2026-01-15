@@ -65,5 +65,4 @@ bool window_impl::is_running() const noexcept
 {
     return running;
 }
-
 } // namespace tlt::window

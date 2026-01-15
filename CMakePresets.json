@@ -35,6 +35,14 @@
                 "CMAKE_CXX_COMPILER": {
                     "type": "STRING",
                     "value": "clang++"
+                },
+                "CMAKE_C_COMPILER_TARGET": {
+                    "type": "STRING",
+                    "value": "x86_64-pc-linux-gnu"
+                },
+                "CMAKE_CXX_COMPILER_TARGET": {
+                    "type": "STRING",
+                    "value": "x86_64-pc-linux-gnu"
                 }
             }
         }

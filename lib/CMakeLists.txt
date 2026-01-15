@@ -1,12 +1,12 @@
 find_package(SDL3 GLOBAL)
 
 if(NOT SDL3_FOUND OR TEMPLATE_DEBUG_3RDPARTY)
+    # Not work for me
     set(SDL_STATIC OFF)
     set(SDL_SHARED ON)
     set(SDL_TESTS OFF)
     set(SDL_WAYLAND ON)
     set(SDL_DISABLE_INSTALL ON)
-    set(SDL_DYNAPI_PROC)
     add_subdirectory(SDL EXCLUDE_FROM_ALL SYSTEM)
 endif()
 
