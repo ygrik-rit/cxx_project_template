@@ -1,3 +1,9 @@
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/version.hxx.in
+    ${CMAKE_CURRENT_BINARY_DIR}/version.hxx
+    @ONLY
+)
+
 add_library(template)
 
 target_sources(
@@ -9,12 +15,16 @@ target_sources(
 target_include_directories(
     template
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        # for include version.hxx
+        ${CMAKE_CURRENT_BINARY_DIR}
+        >
         $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(
     template
-    PRIVATE SDL3::SDL3-shared Vulkan::HppModule template::base
+    PRIVATE SDL3::SDL3-shared Vulkan::Vulkan template::base
 )
 
 add_library(template::template ALIAS template)

@@ -13,3 +13,5 @@ InlayHints:
   ParameterNames: Yes
   DeducedTypes: Yes
   TypeNameLimit: 0 # 0 - mean no limit
+Completion:
+  HeaderInsertion: Never # It not correct work for module code, useless

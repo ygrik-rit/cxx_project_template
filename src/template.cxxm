@@ -1,6 +1,9 @@
 module;
 #include <SDL3/SDL_keycode.h>
+#include <SDL3/SDL_render.h>
 #include <SDL3/SDL_video.h>
+#include <vulkan/vulkan.h>
+
 #include <cstdlib>
 export module engine;
 export import std;
@@ -22,6 +25,156 @@ std::string keycode_to_name(keycode value)
 }
 } // namespace tlt::input
 
+namespace tlt::render
+{
+namespace util
+{
+std::unordered_set<std::string> filterExtensions(
+    std::vector<std::string> availableExtensions,
+    std::vector<std::string> requestedExtensions);
+}
+class PhysicalDevice
+{
+public:
+    PhysicalDevice(VkPhysicalDevice                device,
+                   VkSurfaceKHR                    surface,
+                   const std::vector<std::string>& requestedExtensions,
+                   bool                            printEnumerations = false);
+
+private:
+    void enumerateSurfaceFormats(VkSurfaceKHR surface);
+    void enumerateSurfaceCapabilities(VkSurfaceKHR surface);
+    void enumeratePresentationModes(VkSurfaceKHR surface);
+
+    VkPhysicalDevice         physicalDevice_ = VK_NULL_HANDLE;
+    std::vector<std::string> extensions_;
+
+    VkPhysicalDeviceFragmentDensityMapOffsetPropertiesQCOM
+        fragmentDensityMapOffsetProperties_{
+            .sType =
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_PROPERTIES_QCOM,
+            .pNext = nullptr,
+        };
+
+    VkPhysicalDeviceFragmentDensityMapPropertiesEXT fragmentDensityMapProperties_{
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_PROPERTIES_EXT,
+        .pNext = &fragmentDensityMapOffsetProperties_,
+    };
+
+    VkPhysicalDeviceRayTracingPipelinePropertiesKHR rayTracingPipelineProperties_{
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_PROPERTIES_KHR,
+        .pNext = &fragmentDensityMapProperties_,
+    };
+
+    VkPhysicalDeviceProperties2 properties_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2,
+        .pNext = &rayTracingPipelineProperties_,
+    };
+
+    // Features
+    VkPhysicalDeviceFragmentDensityMapOffsetFeaturesQCOM
+        fragmentDensityMapOffsetFeature_ = {
+            .sType =
+                VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_OFFSET_FEATURES_QCOM,
+            .pNext = nullptr,
+        };
+
+    VkPhysicalDeviceFragmentDensityMapFeaturesEXT fragmentDensityMapFeature_ = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FRAGMENT_DENSITY_MAP_FEATURES_EXT,
+        .pNext = &fragmentDensityMapOffsetFeature_,
+    };
+
+    VkPhysicalDeviceMultiviewFeatures multiviewFeature_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MULTIVIEW_FEATURES,
+        .pNext = &fragmentDensityMapFeature_,
+    };
+
+    VkPhysicalDeviceTimelineSemaphoreFeatures timelineSemaphoreFeature_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_TIMELINE_SEMAPHORE_FEATURES,
+        .pNext = &multiviewFeature_,
+    };
+
+    VkPhysicalDeviceMeshShaderFeaturesNV meshShaderFeature_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MESH_SHADER_FEATURES_NV,
+        .pNext = (void*)&timelineSemaphoreFeature_,
+    };
+
+    VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeature_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR,
+        .pNext = (void*)&meshShaderFeature_,
+    };
+
+    VkPhysicalDeviceRayTracingPipelineFeaturesKHR rayTracingFeature_ = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_TRACING_PIPELINE_FEATURES_KHR,
+        .pNext = (void*)&rayQueryFeature_,
+    };
+
+    VkPhysicalDeviceAccelerationStructureFeaturesKHR accelStructFeature_ = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR,
+        .pNext = (void*)&rayTracingFeature_,
+    };
+
+    VkPhysicalDeviceDescriptorIndexingFeatures descIndexFeature_ = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
+        .pNext = (void*)&accelStructFeature_,
+    };
+
+    VkPhysicalDeviceBufferDeviceAddressFeatures bufferDeviceAddressFeatures_ = {
+        .sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_BUFFER_DEVICE_ADDRESS_FEATURES,
+        .pNext = (void*)&descIndexFeature_,
+    };
+
+    VkPhysicalDeviceVulkan12Features features12_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES,
+        .pNext = (void*)&bufferDeviceAddressFeatures_,
+    };
+
+    VkPhysicalDeviceFeatures2 features_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+        .pNext = (void*)&features12_,
+    };
+    VkPhysicalDeviceMemoryProperties2 memoryProperties_ = {
+        .sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_MEMORY_PROPERTIES_2,
+    };
+    std::optional<uint32_t>               graphicsFamilyIndex_;
+    uint32_t                              graphicsQueueCount_ = 0;
+    std::optional<uint32_t>               computeFamilyIndex_;
+    uint32_t                              computeQueueCount_ = 0;
+    std::optional<uint32_t>               transferFamilyIndex_;
+    uint32_t                              transferQueueCount_ = 0;
+    std::optional<uint32_t>               sparseFamilyIndex_;
+    uint32_t                              sparseQueueCount_ = 0;
+    std::optional<uint32_t>               presentationFamilyIndex_;
+    uint32_t                              presentationQueueCount_ = 0;
+    std::vector<VkQueueFamilyProperties2> queueFamilyProperties_;
+
+    // Swapchain support
+    std::vector<VkSurfaceFormatKHR> surfaceFormats_;
+    VkSurfaceCapabilitiesKHR        surfaceCapabilities_;
+    std::vector<VkPresentModeKHR>   presentModes_;
+    std::unordered_set<std::string> enabledExtensions_;
+};
+class render_impl
+{
+public:
+    render_impl(SDL_Window* window);
+
+private:
+    [[nodiscard]] std::vector<PhysicalDevice> enumeratePhysicalDevices(
+        const std::vector<std::string>& requestedExtensions) const;
+
+    VkInstance   instance_{ VK_NULL_HANDLE };
+    VkSurfaceKHR surface_{ VK_NULL_HANDLE };
+};
+} // namespace tlt::render
+
 namespace tlt::window
 {
 class window_impl
@@ -35,6 +188,7 @@ public:
     void               close() noexcept;
 
     void poll_event() noexcept;
+    void render() noexcept;
 
     [[nodiscard]] bool is_running() const noexcept;
 
@@ -62,6 +216,7 @@ int run()
     while (wnd.is_running())
     {
         wnd.poll_event();
+        wnd.render();
     }
     return EXIT_SUCCESS;
 }
